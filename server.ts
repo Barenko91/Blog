@@ -1,9 +1,11 @@
 import express from "express";
 import 'dotenv/config';
 import router from "./router";
+import cookieParser from 'cookie-parser'
 const PORT = process.env.PORT || 3000;
 const server = express();
 server.use(express.json());
+server.use(cookieParser());
 server.use(express.urlencoded({ extended: true }));
 server.use((req, res, next) => {
   console.log('Corps de la requête:', req.body);
