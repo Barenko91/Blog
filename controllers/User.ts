@@ -1,11 +1,13 @@
-
+import { Response, Request } from "express";
 import { PrismaClient } from "@prisma/client";
-
+import zodSchema from '../utils/zod'
+import bcrypt from 'bcrypt'
+const saltRounds = Number(process.env.SALT)
 const prisma = new PrismaClient();  
 
 const UsersController = {
 
-  getAllUsers: async (req: any, res: any) => {
+  getAllUsers: async (req:Request, res:Response) => {
     try {
       const result = await prisma.user.findMany({ 
         include: { Post: true, Profile: true } 
@@ -18,7 +20,7 @@ const UsersController = {
     }
 
   },
-  getOneUser: async (req: any, res: any) => {
+  getOneUser: async (req:Request, res:Response) => {
     try {
       const { id } = req.params;
       const result = await prisma.user.findUnique({
@@ -32,31 +34,37 @@ const UsersController = {
     }
 
   },
-  createUser: async (req:any, res:any) =>{
-    const {name, email} = req.body
-    if (!name || !email) {
-      return res.status(400).send("le nom et l'email sont obligatoire ! ")
+  createUser: async (req:Request, res:Response) =>{
+    const {name, email, firstName , lastName , password} = req.body
+    zodSchema.User.parse({name, email, firstName, lastName, password})
+     const hashPassword: string = await  bcrypt.hash(password, saltRounds);
+    if (!name || !email || !password) {
+      return res.status(400).send("Merci de renseigner tous les champs.")
     }
     try {
       const result = await prisma.user.create({
         data: {
-          name: name,
-          email: email
+          name,
+          email,
+          firstName,
+          lastName,
+          password: hashPassword
         }
       })
       res.json(result)
       console.log(result)
     } catch (error) {
       console.error(error)
-     return  res.status(500).send('Une erreur est apparue durant la création de votre profile')
+     return  res.status(500).send('Une erreur est apparue durant la création de votre profil')
     }
 
   },
-  modifyUser: async (req:any,res:any) =>{
+  modifyUser: async (req:Request,res:Response) =>{
     const {id} = req.params
-    const {name,email} = req.body
-    console.log(req.body)
-    if (!name || !email) {
+    const {name,email, firstName, lastName, password} = req.body
+    zodSchema.User.parse({name,email,firstName,lastName,password})
+    const hashPassword: string = await  bcrypt.hash(password, saltRounds);
+    if (!name || !email || !password) {
       return res.status(400).send("Vous n'avez rien modifier si vous voulez modifier un champs veuiller le remplir avec la nouvelle données Merci")
     }
     try {
@@ -65,8 +73,11 @@ const UsersController = {
          id: Number(id),
         },
         data : {
-         name:name,
-         email: email
+         name,
+         email,
+         firstName,
+         lastName,
+         password: hashPassword
         }
        })
        res.json(result)
@@ -76,7 +87,7 @@ const UsersController = {
     }
    
   },
-  deleteUser: async (req:any,res:any) =>{
+  deleteUser: async (req:Request,res:Response) =>{
     const {id} = req.params
     try {
       const result = await prisma.user.delete({
@@ -92,6 +103,4 @@ const UsersController = {
     }
   }
 };
-
-
 export default UsersController;

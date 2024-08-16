@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const zod_1 = __importDefault(require("../utils/zod"));
 const prisma = new client_1.PrismaClient();
 const PostController = {
     getAllPosts: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -43,16 +47,18 @@ const PostController = {
         }
     }),
     creatPost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { id } = req.params;
         try {
-            const { title, content, userId } = req.body;
-            if (!title || !content || !userId) {
-                return res.status(400).send('Les champs title, content et userId sont requis.');
+            const { title, content } = req.body;
+            zod_1.default.Post.parse({ title, content });
+            if (!title || !content) {
+                return res.status(400).send('Les champs title, content sont requis.');
             }
             const result = yield prisma.post.create({
                 data: {
                     title,
                     content,
-                    authorId: Number(userId)
+                    authorId: Number(id)
                 }
             });
             res.json(result);

@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-
-
+import { Response, Request } from "express";
+import zodSchema from "../utils/zod";
 const prisma = new PrismaClient();
 
 const PostController = {
-  getAllPosts: async (req: any, res: any) => {
+  getAllPosts: async (req:Request, res:Response) => {
     try {
       const result = await prisma.post.findMany({
         include: { 
@@ -20,7 +20,7 @@ const PostController = {
     }
 
   },
-  getOnePost: async (req: any, res: any) => {
+  getOnePost: async (req:Request, res:Response) => {
     try {
       const { id } = req.params;
       const result = await prisma.post.findUnique({
@@ -34,17 +34,19 @@ const PostController = {
     }
 
   },
-  creatPost: async (req: any, res: any) => {
+  creatPost: async (req:Request, res:Response) => {
+    const {id} = req.params
     try {
-      const { title, content, userId } = req.body;
-      if (!title || !content || !userId) {
-        return res.status(400).send('Les champs title, content et userId sont requis.')
+      const { title, content} = req.body;
+      zodSchema.Post.parse({title,content})
+      if (!title || !content) {
+        return res.status(400).send('Les champs title, content sont requis.')
       }
       const result = await prisma.post.create({
         data: {
           title,
           content,
-          authorId: Number(userId)
+          authorId: Number(id)
         }
       });
       res.json(result);
@@ -54,7 +56,7 @@ const PostController = {
       return res.status(500).send('Erreur du serveur');
     }
   },
-  modifyPost : async (req:any, res:any) => {
+  modifyPost : async (req:any, res:Response) => {
     try {
       const {id} = req.params
       const {content, title} = req.body
@@ -73,7 +75,7 @@ const PostController = {
       console.error(error)
     }
   },
-  deletePost : async (req: any, res: any) => {
+  deletePost : async (req:Request, res:Response) => {
     try {
       const { id } = req.params;
       const result = await prisma.post.delete({
