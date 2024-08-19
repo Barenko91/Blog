@@ -1,0 +1,20 @@
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"2024-08-19 14:24:29"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"2024-08-19 14:24:30"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:25:26"}
+{"level":"info","message":"Corps de la requête:","service":"user-service","timestamp":"19-08-2024 14:25:48"}
+{"level":"info","message":"Cookies  : ","service":"user-service","timestamp":"19-08-2024 14:25:48"}
+{"accept":"*/*","accept-encoding":"gzip, deflate, br, zstd","accept-language":"fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7","connection":"keep-alive","content-type":"application/json","host":"localhost:4000","level":"info","message":"En-têtes de la requête:","sec-fetch-dest":"empty","sec-fetch-mode":"cors","sec-fetch-site":"none","service":"user-service","timestamp":"19-08-2024 14:25:48","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:27:22"}
+{"level":"info","message":"Corps de la requête:","service":"user-service","timestamp":"19-08-2024 14:27:44"}
+{"level":"info","message":"Cookies  : ","service":"user-service","timestamp":"19-08-2024 14:27:44"}
+{"accept":"*/*","accept-encoding":"gzip, deflate, br, zstd","accept-language":"fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7","connection":"keep-alive","content-type":"application/json","host":"localhost:4000","if-none-match":"W/\"a6-ESSOfAmxfTVhG7srEJY3VF7VGPw\"","level":"info","message":"En-têtes de la requête:","sec-fetch-dest":"empty","sec-fetch-mode":"cors","sec-fetch-site":"none","service":"user-service","timestamp":"19-08-2024 14:27:44","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"}
+{"level":"info","message":"Corps de la requête:","service":"user-service","timestamp":"19-08-2024 14:28:51"}
+{"level":"info","message":"Cookies  : ","service":"user-service","timestamp":"19-08-2024 14:28:51"}
+{"accept":"*/*","accept-encoding":"gzip, deflate, br, zstd","accept-language":"fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7","connection":"keep-alive","content-type":"application/json","host":"localhost:4000","level":"info","message":"En-têtes de la requête:","sec-fetch-dest":"empty","sec-fetch-mode":"cors","sec-fetch-site":"none","service":"user-service","timestamp":"19-08-2024 14:28:51","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"}
+{"level":"error","message":"token is null","service":"user-service","timestamp":"19-08-2024 14:28:51"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:29:48"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:31:41"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:42:30"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:43:02"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:45:03"}
+{"level":"info","message":"app is running on http://localhost:4000","service":"user-service","timestamp":"19-08-2024 14:52:07"}

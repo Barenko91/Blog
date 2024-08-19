@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 import zodSchema from "../utils/zod";
 const prisma = new PrismaClient();
 
 const PostController = {
-  getAllPosts: async (req:Request, res:Response) => {
+  getAllPosts: async (req:Request, res:Response, next:NextFunction) => {
     try {
       const result = await prisma.post.findMany({
         include: { 
@@ -14,12 +14,15 @@ const PostController = {
         }
       });
       return res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).send('Erreur du serveur');
+    } catch (err) {
+      const error:any = new Error()
+      error.details="les post n'ont pas été trouvé."
+      error.status=500
+
     }
 
   },
-  getOnePost: async (req:Request, res:Response) => {
+  getOnePost: async (req:Request, res:Response, next:NextFunction) => {
     try {
       const { id } = req.params;
       const result = await prisma.post.findUnique({
@@ -27,18 +30,23 @@ const PostController = {
         include: { User: true }
       });
       res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).send('Une erreur est survenue.')
+    } catch (err) {
+      const error:any = new Error()
+      error.details="Le post n'a pas été trouvé."
+      error.status=500
+      
     }
 
   },
-  creatPost: async (req:Request, res:Response) => {
+  creatPost: async (req:Request, res:Response, next:NextFunction) => {
     const {id} = req.params
     try {
       const { title, content} = req.body;
       zodSchema.Post.parse({title,content})
       if (!title || !content) {
-        return res.status(400).send('Les champs title, content sont requis.')
+        const error:any = new Error()
+        error.details='titre ou content manquant'
+        error.status=400
       }
       const result = await prisma.post.create({
         data: {
@@ -48,15 +56,27 @@ const PostController = {
         }
       });
       return res.status(200).json(result);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).send('Erreur du serveur');
+    } catch (err) {
+      const error:any = new Error()
+      error.details="Création annulé"
+      error.status=500
+
     }
   },
-  modifyPost : async (req:any, res:Response) => {
+  modifyPost : async (req:any, res:Response, next:NextFunction) => {
     try {
       const {id} = req.params
+      if (!req.params) {
+        const error:any = new Error()
+        error.details= 'req.params manquant'
+        error.status=400
+      }
       const {content, title} = req.body
+      if (!title || !content) {
+        const error:any = new Error()
+        error.details='titre ou content manquant'
+        error.status=400
+      }
       const result = await prisma.post.update({
         where: {
           id: Number(id)
@@ -67,19 +87,29 @@ const PostController = {
         }
       })
       return res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).send('Erreur du serveur');
+    } catch (err) {
+      const error:any = new Error()
+      error.details="Modification annulé"
+      error.status=500
     }
   },
-  deletePost : async (req:Request, res:Response) => {
+  deletePost : async (req:Request, res:Response, next:NextFunction) => {
     try {
       const { id } = req.params;
+      if (!req.params) {
+        const error:any = new Error()
+        error.details='req.params manquant'
+        error.status=400
+      }
       const result = await prisma.post.delete({
         where: { id: Number(id) }
       });
       return res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).send('Erreur du serveur');
+    } catch (err) {
+      const error:any = new Error()
+      error.details="Suppression annulé"
+      error.status=500
+
     }
   },
 };

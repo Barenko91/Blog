@@ -16,7 +16,7 @@ const client_1 = require("@prisma/client");
 const zod_1 = __importDefault(require("../utils/zod"));
 const prisma = new client_1.PrismaClient();
 const PostController = {
-    getAllPosts: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getAllPosts: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const result = yield prisma.post.findMany({
                 include: {
@@ -27,11 +27,13 @@ const PostController = {
             });
             return res.status(200).json(result);
         }
-        catch (error) {
-            return res.status(500).send('Erreur du serveur');
+        catch (err) {
+            const error = new Error();
+            error.details = "les post n'ont pas été trouvé.";
+            error.status = 500;
         }
     }),
-    getOnePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getOnePost: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const { id } = req.params;
             const result = yield prisma.post.findUnique({
@@ -40,17 +42,21 @@ const PostController = {
             });
             res.status(200).json(result);
         }
-        catch (error) {
-            return res.status(500).send('Une erreur est survenue.');
+        catch (err) {
+            const error = new Error();
+            error.details = "Le post n'a pas été trouvé.";
+            error.status = 500;
         }
     }),
-    creatPost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    creatPost: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         try {
             const { title, content } = req.body;
             zod_1.default.Post.parse({ title, content });
             if (!title || !content) {
-                return res.status(400).send('Les champs title, content sont requis.');
+                const error = new Error();
+                error.details = 'titre ou content manquant';
+                error.status = 400;
             }
             const result = yield prisma.post.create({
                 data: {
@@ -61,15 +67,26 @@ const PostController = {
             });
             return res.status(200).json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send('Erreur du serveur');
+        catch (err) {
+            const error = new Error();
+            error.details = "Création annulé";
+            error.status = 500;
         }
     }),
-    modifyPost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    modifyPost: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const { id } = req.params;
+            if (!req.params) {
+                const error = new Error();
+                error.details = 'req.params manquant';
+                error.status = 400;
+            }
             const { content, title } = req.body;
+            if (!title || !content) {
+                const error = new Error();
+                error.details = 'titre ou content manquant';
+                error.status = 400;
+            }
             const result = yield prisma.post.update({
                 where: {
                     id: Number(id)
@@ -81,20 +98,29 @@ const PostController = {
             });
             return res.status(200).json(result);
         }
-        catch (error) {
-            return res.status(500).send('Erreur du serveur');
+        catch (err) {
+            const error = new Error();
+            error.details = "Modification annulé";
+            error.status = 500;
         }
     }),
-    deletePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    deletePost: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const { id } = req.params;
+            if (!req.params) {
+                const error = new Error();
+                error.details = 'req.params manquant';
+                error.status = 400;
+            }
             const result = yield prisma.post.delete({
                 where: { id: Number(id) }
             });
             return res.status(200).json(result);
         }
-        catch (error) {
-            return res.status(500).send('Erreur du serveur');
+        catch (err) {
+            const error = new Error();
+            error.details = "Suppression annulé";
+            error.status = 500;
         }
     }),
 };

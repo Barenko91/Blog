@@ -7,6 +7,7 @@ exports.generateToken = generateToken;
 exports.authenticateToken = authenticateToken;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require("dotenv/config");
+const logger_1 = __importDefault(require("./logger"));
 function generateToken(data) {
     if (!process.env.TOKEN_SECRET) {
         throw new Error('TOKEN_SECRET is not defined in environment variables');
@@ -17,12 +18,12 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     if (token == null) {
-        console.log("token is null");
+        logger_1.default.error("token is null");
         return res.sendStatus(401);
     }
     jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET, (err, user) => {
         if (err) {
-            console.log("token failed", err);
+            logger_1.default.error("token failed", err);
             return res.sendStatus(403);
         }
         req.user = user;

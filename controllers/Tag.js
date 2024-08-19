@@ -16,10 +16,13 @@ const client_1 = require("@prisma/client");
 const zod_1 = __importDefault(require("../utils/zod"));
 const prisma = new client_1.PrismaClient();
 const tagcontrollers = {
-    getOneTag: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getOneTag: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         if (!req.params) {
-            return res.status(400).send("Une erreur est survenue.");
+            const error = new Error();
+            error.details = 'req.params non présent.';
+            error.status = 400;
+            return next(error);
         }
         try {
             const result = yield prisma.tag.findUnique({
@@ -27,26 +30,33 @@ const tagcontrollers = {
             });
             return res.json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send("Une erreur est survenue.");
+        catch (err) {
+            const error = new Error();
+            error.details = 'Tag non trouvé.';
+            error.status = 500;
+            return next(error);
         }
     }),
-    getAllTags: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getAllTags: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const result = yield prisma.tag.findMany();
             return res.json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send('Une erreur est survenue');
+        catch (err) {
+            const error = new Error();
+            error.details = 'Aucun tags trouvé.';
+            error.status = 500;
+            return next(error);
         }
     }),
-    createTag: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    createTag: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { name } = req.body;
         zod_1.default.Tag.parse(name);
         if (!name) {
-            return res.status(400).send('Veuiller donnnées un nom à votre tag');
+            const error = new Error();
+            error.details = 'name non fournie.';
+            error.status = 400;
+            return next(error);
         }
         try {
             const result = yield prisma.tag.create({
@@ -54,12 +64,14 @@ const tagcontrollers = {
             });
             return res.json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send("Une erreur est survenue.");
+        catch (err) {
+            const error = new Error();
+            error.details = 'Création annuler une erreure est arrivée';
+            error.status = 500;
+            return next(error);
         }
     }),
-    modifyTag: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    modifyTag: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { name } = req.body;
         zod_1.default.Tag.parse(name);
         const { id } = req.params;
@@ -73,12 +85,14 @@ const tagcontrollers = {
             });
             return res.json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send("Une erreur est survenue.");
+        catch (err) {
+            const error = new Error();
+            error.details = 'Modification annuler une erreur est survenue.';
+            error.status = 500;
+            return next(error);
         }
     }),
-    deleteTag: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    deleteTag: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         try {
             const result = yield prisma.tag.delete({
@@ -88,9 +102,11 @@ const tagcontrollers = {
             });
             return res.json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send('Une erreur est survenue.');
+        catch (err) {
+            const error = new Error();
+            error.details = 'Suppression annulé une erreur est survenue;';
+            error.status = 500;
+            return next(error);
         }
     })
 };

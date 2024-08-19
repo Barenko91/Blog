@@ -9,10 +9,13 @@ const Post_1 = __importDefault(require("./controllers/Post"));
 const Tag_1 = __importDefault(require("./controllers/Tag"));
 const isAuthed_1 = __importDefault(require("./controllers/isAuthed"));
 const homeController_1 = __importDefault(require("./controllers/homeController"));
+const adminChecker_1 = __importDefault(require("./middleware/adminChecker"));
+const adminController_1 = __importDefault(require("./controllers/adminController"));
+const jwtUtils_1 = require("./utils/jwtUtils");
 const router = (0, express_1.Router)();
 router.post("/login", isAuthed_1.default.login)
-    .get("/", homeController_1.default.renderHomeController);
-// router.use(authenticateToken);
+    .get("/", homeController_1.default.renderHomePage);
+router.use(jwtUtils_1.authenticateToken);
 router.get('/logout', isAuthed_1.default.logout);
 router.get("/post", Post_1.default.getAllPosts)
     .get("/post/:id", Post_1.default.getOnePost)
@@ -30,4 +33,8 @@ router.get("/tags", Tag_1.default.getAllTags)
     .post("/tag", Tag_1.default.createTag)
     .put("/tag/:id", Tag_1.default.modifyTag)
     .delete("/tag/:id", Tag_1.default.deleteTag);
+router.use(adminChecker_1.default);
+router.get("/admin/id", adminController_1.default.renderAdminPage)
+    .post("/admin", adminController_1.default.createAdmin)
+    .delete("/admin/:id", adminController_1.default.deleteAdmin);
 exports.default = router;

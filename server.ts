@@ -5,6 +5,8 @@ import errorHandler from "./middleware/error";
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import helmet, { contentSecurityPolicy, hsts } from "helmet";
+import logger from "./utils/logger";
+import NodeCache from "node-cache";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -28,14 +30,13 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use((req, res, next) => {
-  console.log('Corps de la requête:', req.body);
-  console.log("Cookies  : ",req.signedCookies)
-  console.log('En-têtes de la requête:', req.headers);
+  logger.info('Corps de la requête:', req.body);
+  logger.info('En-têtes de la requête:', req.headers);
   next();
 });
 
 app.use(router);
 app.use(errorHandler)
 app.listen(PORT, () => {
-  console.log(`app is running on http://localhost:${PORT}`);
+  logger.info(`app is running on http://localhost:${PORT}`);
 });

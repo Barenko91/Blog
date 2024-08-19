@@ -10,16 +10,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const cache_1 = require("../middleware/cache");
 const prisma = new client_1.PrismaClient();
 const homeController = {
-    renderHomeController: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    renderHomePage: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
+            const cacheKey = "lastPost";
+            const cachedPosts = (0, cache_1.getCache)(cacheKey);
+            if (cachedPosts) {
+                return res.status(200).json(cachedPosts);
+            }
             const lastPosts = yield prisma.post.findMany({
                 orderBy: {
                     createdAt: 'desc'
                 },
                 take: 10
             });
+            (0, cache_1.setCache)(cacheKey, lastPosts, 3600);
             return res.status(200).json(lastPosts);
         }
         catch (error) {
