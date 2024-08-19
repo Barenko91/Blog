@@ -25,11 +25,10 @@ const PostController = {
                     }
                 }
             });
-            res.json(result);
-            console.log(result);
+            return res.status(200).json(result);
         }
         catch (error) {
-            console.error(error);
+            return res.status(500).send('Erreur du serveur');
         }
     }),
     getOnePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -39,11 +38,10 @@ const PostController = {
                 where: { id: Number(id) },
                 include: { User: true }
             });
-            res.json(result);
-            console.log(result);
+            res.status(200).json(result);
         }
         catch (error) {
-            console.error(error);
+            return res.status(500).send('Une erreur est survenue.');
         }
     }),
     creatPost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -61,8 +59,7 @@ const PostController = {
                     authorId: Number(id)
                 }
             });
-            res.json(result);
-            console.log(result);
+            return res.status(200).json(result);
         }
         catch (error) {
             console.error(error);
@@ -82,11 +79,10 @@ const PostController = {
                     content: content
                 }
             });
-            res.json(result);
-            console.log(result);
+            return res.status(200).json(result);
         }
         catch (error) {
-            console.error(error);
+            return res.status(500).send('Erreur du serveur');
         }
     }),
     deletePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -95,11 +91,10 @@ const PostController = {
             const result = yield prisma.post.delete({
                 where: { id: Number(id) }
             });
-            res.json(result);
-            console.log(result);
+            return res.status(200).json(result);
         }
         catch (error) {
-            console.error(error);
+            return res.status(500).send('Erreur du serveur');
         }
     }),
 };

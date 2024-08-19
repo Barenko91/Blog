@@ -7,12 +7,14 @@ const express_1 = require("express");
 const User_1 = __importDefault(require("./controllers/User"));
 const Post_1 = __importDefault(require("./controllers/Post"));
 const Tag_1 = __importDefault(require("./controllers/Tag"));
+const isAuthed_1 = __importDefault(require("./controllers/isAuthed"));
+const homeController_1 = __importDefault(require("./controllers/homeController"));
 const router = (0, express_1.Router)();
-router.use(function timeLog(req, res, next) {
-    console.log('Time: ', Date.now());
-    next();
-});
-router.get("/", Post_1.default.getAllPosts)
+router.post("/login", isAuthed_1.default.login)
+    .get("/", homeController_1.default.renderHomeController);
+// router.use(authenticateToken);
+router.get('/logout', isAuthed_1.default.logout);
+router.get("/post", Post_1.default.getAllPosts)
     .get("/post/:id", Post_1.default.getOnePost)
     .post("/post", Post_1.default.creatPost)
     .put("/post/:id", Post_1.default.modifyPost)
@@ -20,6 +22,7 @@ router.get("/", Post_1.default.getAllPosts)
 router.get("/users", User_1.default.getAllUsers)
     .get("/users/:id", User_1.default.getOneUser)
     .post("/user", User_1.default.createUser)
+    .post("/admin", User_1.default.createAdmin)
     .put("/user/:id", User_1.default.modifyUser)
     .delete("/user/:id", User_1.default.deleteUser);
 router.get("/tags", Tag_1.default.getAllTags)

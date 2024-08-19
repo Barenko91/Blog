@@ -6,21 +6,39 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("dotenv/config");
 const router_1 = __importDefault(require("./router"));
+const error_1 = __importDefault(require("./middleware/error"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const cors_1 = __importDefault(require("cors"));
+const helmet_1 = __importDefault(require("helmet"));
 const PORT = process.env.PORT || 3000;
-const server = (0, express_1.default)();
-server.use(express_1.default.json());
-server.use((0, cookie_parser_1.default)());
-server.use(express_1.default.urlencoded({ extended: true }));
-server.use((req, res, next) => {
+const app = (0, express_1.default)();
+const cookiesSecret = process.env.SECRET_COOKIES_KEY;
+const corsOptions = {
+    origin: 'http://localhost:4000/',
+    optionsSuccessStatus: 200
+};
+app.use(express_1.default.json());
+app.use((0, cookie_parser_1.default)(cookiesSecret));
+app.use(express_1.default.urlencoded({ extended: true }));
+if (process.env.NODE_ENV === 'development') {
+    app.use((0, cors_1.default)(corsOptions));
+    app.use((0, helmet_1.default)({
+        contentSecurityPolicy: false,
+        hsts: false
+    }));
+}
+else {
+    app.use((0, cors_1.default)());
+    app.use((0, helmet_1.default)());
+}
+app.use((req, res, next) => {
     console.log('Corps de la requête:', req.body);
-    next();
-});
-server.use((req, res, next) => {
+    console.log("Cookies  : ", req.signedCookies);
     console.log('En-têtes de la requête:', req.headers);
     next();
 });
-server.use(router_1.default);
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.use(router_1.default);
+app.use(error_1.default);
+app.listen(PORT, () => {
+    console.log(`app is running on http://localhost:${PORT}`);
 });

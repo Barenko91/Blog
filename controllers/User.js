@@ -15,41 +15,51 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const zod_1 = __importDefault(require("../utils/zod"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const zod_2 = require("zod");
 const saltRounds = Number(process.env.SALT);
 const prisma = new client_1.PrismaClient();
+const error = new Error();
 const UsersController = {
-    getAllUsers: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getAllUsers: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const result = yield prisma.user.findMany({
                 include: { Post: true, Profile: true }
             });
-            res.json(result);
-            console.log(result);
+            return res.status(220).json(result);
         }
-        catch (error) {
-            console.error(error);
+        catch (err) {
+            const error = new Error();
+            error.details = "Aucun utilisateur présent en BDD.";
+            error.status = 500;
+            return next(error);
         }
     }),
-    getOneUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getOneUser: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const { id } = req.params;
             const result = yield prisma.user.findUnique({
                 where: { id: Number(id) },
                 include: { Post: true, Profile: true }
             });
-            res.json(result);
-            console.log(result);
+            return res.status(220).json(result);
+            ;
         }
-        catch (error) {
-            console.error(error);
+        catch (err) {
+            const error = new Error();
+            error.details = "Utilisateur inconnue.";
+            error.status = 500;
+            return next(error);
         }
     }),
-    createUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    createUser: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { name, email, firstName, lastName, password } = req.body;
         zod_1.default.User.parse({ name, email, firstName, lastName, password });
         const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
         if (!name || !email || !password) {
-            return res.status(400).send("Merci de renseigner tous les champs.");
+            const error = new Error();
+            error.details = 'les champs email, name ou password sont manquant.';
+            error.status = 400;
+            return next(error);
         }
         try {
             const result = yield prisma.user.create({
@@ -61,21 +71,25 @@ const UsersController = {
                     password: hashPassword
                 }
             });
-            res.json(result);
-            console.log(result);
+            return res.status(220).json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send('Une erreur est apparue durant la création de votre profil');
+        catch (err) {
+            const error = new Error();
+            error.details = 'Création non effectué';
+            error.status = 500;
+            return next(error);
         }
     }),
-    modifyUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    modifyUser: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         const { name, email, firstName, lastName, password } = req.body;
         zod_1.default.User.parse({ name, email, firstName, lastName, password });
         const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
         if (!name || !email || !password) {
-            return res.status(400).send("Vous n'avez rien modifier si vous voulez modifier un champs veuiller le remplir avec la nouvelle données Merci");
+            const error = new Error();
+            error.details = 'Des champs obligatoire sont manquant.';
+            error.status = 400;
+            return next(error);
         }
         try {
             const result = yield prisma.user.update({
@@ -90,14 +104,16 @@ const UsersController = {
                     password: hashPassword
                 }
             });
-            res.json(result);
+            return res.status(220).json(result);
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send("Une erreur est survenue ! ");
+        catch (err) {
+            const error = new Error();
+            error.details = 'modification non effectué';
+            error.status = 500;
+            return next(error);
         }
     }),
-    deleteUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    deleteUser: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         try {
             const result = yield prisma.user.delete({
@@ -105,12 +121,49 @@ const UsersController = {
                     id: Number(id)
                 }
             });
-            res.json(result);
+            return res.status(220).json(result);
             console.log("Supression réussi");
         }
-        catch (error) {
-            console.error(error);
-            return res.status(500).send("Une erreur est survenue veuillez reéssayer");
+        catch (err) {
+            const error = new Error();
+            error.details = 'Suppression non effectué';
+            error.status = 500;
+            return next(error);
+        }
+    }),
+    createAdmin: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const { name, email, firstName, lastName, password } = req.body;
+        if (!name || !email || !password) {
+            const error = new Error();
+            error.details = 'champs obligatoire manquant';
+            error.status = 401;
+            return next(error);
+        }
+        try {
+            zod_1.default.User.parse({ name, email, firstName, lastName, password });
+            const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
+            const result = yield prisma.user.create({
+                data: {
+                    name,
+                    email,
+                    firstName,
+                    lastName,
+                    password: hashPassword,
+                    admin: true
+                }
+            });
+            return res.status(220).json(result);
+        }
+        catch (err) {
+            if (err instanceof zod_2.ZodError) {
+                const error = new Error();
+                error.details = 'Validation des données échoué.';
+                error.status = 400;
+            }
+            const error = new Error();
+            error.details = 'création non achevée';
+            error.status = 500;
+            return next(error);
         }
     })
 };
