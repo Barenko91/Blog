@@ -1,6 +1,6 @@
 import { Response,Request,NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import 'doten/config'
+import 'dotenv/config'
 
 const adminChecker = function (req:Request,res:Response,next:NextFunction){
   const token = req.headers.authorization?.split(" ")[1];

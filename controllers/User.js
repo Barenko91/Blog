@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const zod_1 = __importDefault(require("../utils/zod"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const zod_2 = require("zod");
 const saltRounds = Number(process.env.SALT);
 const prisma = new client_1.PrismaClient();
 const error = new Error();
@@ -122,7 +121,6 @@ const UsersController = {
                 }
             });
             return res.status(220).json(result);
-            console.log("Supression réussi");
         }
         catch (err) {
             const error = new Error();
@@ -131,40 +129,5 @@ const UsersController = {
             return next(error);
         }
     }),
-    createAdmin: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const { name, email, firstName, lastName, password } = req.body;
-        if (!name || !email || !password) {
-            const error = new Error();
-            error.details = 'champs obligatoire manquant';
-            error.status = 401;
-            return next(error);
-        }
-        try {
-            zod_1.default.User.parse({ name, email, firstName, lastName, password });
-            const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
-            const result = yield prisma.user.create({
-                data: {
-                    name,
-                    email,
-                    firstName,
-                    lastName,
-                    password: hashPassword,
-                    admin: true
-                }
-            });
-            return res.status(220).json(result);
-        }
-        catch (err) {
-            if (err instanceof zod_2.ZodError) {
-                const error = new Error();
-                error.details = 'Validation des données échoué.';
-                error.status = 400;
-            }
-            const error = new Error();
-            error.details = 'création non achevée';
-            error.status = 500;
-            return next(error);
-        }
-    })
 };
 exports.default = UsersController;

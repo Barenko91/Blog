@@ -109,7 +109,6 @@ const UsersController = {
         }
       })
       return res.status(220).json(result)
-      console.log("Supression réussi")
     } catch (err) {
       const error:any = new Error();
       error.details='Suppression non effectué'
@@ -117,40 +116,5 @@ const UsersController = {
       return next(error)
     }
   },
-  createAdmin : async (req:Request, res:Response, next:NextFunction) =>{
-    const {name, email, firstName , lastName , password} = req.body
-   
-    if (!name || !email || !password) {
-      const error:any = new Error();
-      error.details= 'champs obligatoire manquant'
-      error.status= 401
-      return next(error)
-    }
-    try {
-      zodSchema.User.parse({name, email, firstName, lastName, password})
-      const hashPassword: string = await  bcrypt.hash(password, saltRounds);
-      const result = await prisma.user.create({
-        data: {
-          name,
-          email,
-          firstName,
-          lastName,
-          password: hashPassword,
-          admin: true
-        }
-      })
-      return res.status(220).json(result)
-    } catch (err) {
-      if (err instanceof ZodError) {
-        const error:any = new Error();
-        error.details= 'Validation des données échoué.'
-        error.status= 400
-      }
-      const error:any = new Error();
-      error.details= 'création non achevée'
-      error.status = 500
-      return next(error)
-    }
-  }
 };
 export default UsersController;

@@ -41,6 +41,32 @@ const adminController = {
             }
         });
     },
+    modifyAdmin(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { name, email, password, firstName, lastName } = req.body;
+            try {
+                zod_1.default.User.parse({ name, email, password, firstName, lastName });
+                const hashPassword = yield bcrypt_1.default.hash(password, saltRounds);
+                const result = yield prisma.user.update({
+                    where: { id: Number(id) },
+                    data: {
+                        name: name,
+                        email: email,
+                        password: hashPassword,
+                        firstName: firstName,
+                        lastName: lastName
+                    },
+                });
+                return res.status(200).json(result);
+            }
+            catch (err) {
+                const error = new Error("Une erreur est survenue.");
+                error.details = "Probleme de connexion a la BDD!";
+                error.status = 500;
+            }
+        });
+    },
     createAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, email, password, lastName, firstName } = req.body;
@@ -54,14 +80,15 @@ const adminController = {
             try {
                 const result = yield prisma.user.create({
                     data: {
-                        name,
-                        email,
-                        firstName,
-                        lastName,
+                        name: name,
+                        email: email,
+                        firstName: firstName,
+                        lastName: lastName,
                         password: hashPassword,
                         admin: true
                     }
                 });
+                console.log("RESULT :", result);
                 return res.status(200).json(result);
             }
             catch (err) {
@@ -80,11 +107,12 @@ const adminController = {
                 error.status = 401;
             }
             try {
-                prisma.user.delete({
+                yield prisma.user.delete({
                     where: {
                         id: Number(id)
                     }
                 });
+                return res.status(200).json({ message: "Utilisteur supprimer avec succès !" });
             }
             catch (err) {
                 const error = new Error();

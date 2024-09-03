@@ -2,7 +2,9 @@ import { Response,Request } from "express";
 import { PrismaClient } from "@prisma/client";
 import NodeCache from "node-cache";
 import { setCache, getCache } from "../middleware/cache";
+
 const prisma = new PrismaClient()
+
 const homeController = {
 
   renderHomePage: async (req:Request, res:Response) =>{
